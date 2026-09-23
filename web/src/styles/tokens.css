@@ -1,0 +1,80 @@
+/*
+ * 设计令牌 —— 演播厅暗场单主题。
+ *
+ * 「颜色即身份」是这套系统的核心约束：中性色阶负责结构，琥珀金固定代表主持人，
+ * 每位嘉宾的色相由后端下发（palette.ts），前端只提供语义色槽位，不参与配色决策。
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* 中性色阶：近黑墨色 + 一点冷调，避免纯黑带来的廉价感 */
+  --ink-950: #06070a;
+  --ink-900: #0b0c0f;
+  --ink-850: #101219;
+  --ink-800: #151821;
+  --ink-700: #1c202a;
+  --ink-600: #252a36;
+  --line-soft: #212631;
+  --line: #2e3441;
+  --line-strong: #3c4353;
+
+  --text-strong: #f3f5f9;
+  --text: #d2d7e1;
+  --text-muted: #99a1b1;
+  --text-faint: #6c7484;
+
+  /* 舞台琥珀金：品牌主色，同时固定为「主持人」的身份色 */
+  --gold: #e7b24a;
+  --gold-bright: #f2c86e;
+  --gold-deep: #b98c31;
+  --gold-wash: rgba(231, 178, 74, 0.12);
+
+  /* ON AIR 指示灯：低饱和朱红 */
+  --air: #d9614a;
+  --air-wash: rgba(217, 97, 74, 0.14);
+
+  /* 共识 / 分歧 / 仍在形成 */
+  --consensus: #62c2a0;
+  --divergence: #d9737a;
+  --pending: #e0c25f;
+
+  /* 字体：标题衬线（编辑部质感）、正文无衬线、时间戳等宽 */
+  --font-serif: "Songti SC", "Noto Serif SC", "Source Han Serif SC", STSong, Georgia, serif;
+  --font-sans: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", SFMono-Regular, Consolas, "Liberation Mono", monospace;
+
+  /* 4pt 间距刻度：命名描述用途而非像素 */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+  --space-4xl: 64px;
+
+  --radius-sm: 3px;
+  --radius: 6px;
+  --radius-lg: 10px;
+  --radius-pill: 999px;
+
+  /* 动效：只动 transform / opacity，时长收敛在 100–500ms */
+  --dur-fast: 120ms;
+  --dur-base: 240ms;
+  --dur-slow: 420ms;
+  --ease-out: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* 语义化层级阶梯 */
+  --z-sticky: 10;
+  --z-overlay: 40;
+  --z-toast: 60;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+
+  /* 三栏演播厅的断点语义（供布局与文档统一引用） */
+  --bp-wide: 1400px;
+  --bp-medium: 1024px;
+}
