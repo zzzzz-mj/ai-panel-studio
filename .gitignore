@@ -1,0 +1,36 @@
+# 依赖
+node_modules/
+.pnpm-store/
+
+# 构建产物
+dist/
+build/
+*.tsbuildinfo
+
+# 运行时数据（SQLite 数据库由初始化脚本重建）
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# 环境变量：真实密钥绝不入库
+.env
+.env.local
+.env.*.local
+
+# 日志与临时文件
+logs/
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# 编辑器
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# 测试
+coverage/
+.nyc_output/

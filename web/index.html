@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta
+      name="description"
+      content="AI Panel Studio —— 输入议题，召集一场由 AI 驱动、实时推进的圆桌讨论"
+    />
+    <title>AI Panel Studio · AI 圆桌讨论</title>
+    <script>
+      // 在最早的时机标记 JS 可用，入场动画的初始隐藏态只对确认可用的会话生效（fail-open）。
+      document.documentElement.classList.add('has-js');
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
