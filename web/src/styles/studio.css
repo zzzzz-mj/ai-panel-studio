@@ -1,0 +1,556 @@
+/*
+ * 演播厅。
+ *
+ * 三栏语义固定为「人 / 现场 / 结论」：
+ *   嘉宾席（状态小窗） · 现场 Transcript · 实时共识与分歧 + 主持人总结
+ *
+ * 整页不滚动。三个区域各自拥有滚动边界，因此超宽屏、常规桌面、窄屏
+ * 只是在重新分配同一组区域，而不需要给页面加一个总滚动条。
+ */
+
+.studio--loading {
+  align-items: center;
+  justify-content: center;
+}
+
+/* ------------------------------------------------------------ 头部 */
+
+.studio__head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+  padding: var(--space-lg) var(--space-xl);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.studio__head-main {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+.studio__head-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.studio__head-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.studio__round {
+  font-size: 11px;
+}
+
+.studio__topic {
+  font-size: 20px;
+  line-height: 1.4;
+  max-width: 62ch;
+}
+
+.studio__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+/* 窄屏才出现的区域切换器 */
+.studio__tabs {
+  display: none;
+}
+
+/* ------------------------------------------------------------ 三栏骨架 */
+
+.studio__body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  gap: var(--space-lg);
+  padding: var(--space-lg) var(--space-xl) var(--space-xl);
+}
+
+.studio__region {
+  min-height: 0;
+  min-width: 0;
+}
+
+.studio__summary {
+  flex: none;
+  max-height: 42%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 var(--space-lg) var(--space-md);
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+/* ------------------------------------------------------------ 嘉宾席 */
+
+.roster {
+  flex: 1;
+  min-height: 0;
+}
+
+.roster__list {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-xs) var(--space-lg) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.roster__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-md);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: var(--ink-850);
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    background var(--dur-base) var(--ease-out);
+}
+
+/* 状态灯：待机=灰、整理思路=麦黄、准备发言=呼吸、发言中=常亮强调 */
+.roster__lamp {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-faint);
+}
+
+.roster__item[data-status="thinking"] .roster__lamp {
+  background: var(--pending);
+}
+
+.roster__item[data-status="ready"] {
+  border-color: var(--line-strong);
+}
+
+.roster__item[data-status="ready"] .roster__lamp {
+  background: var(--accent);
+  animation: pulse 1.6s var(--ease-out) infinite;
+}
+
+.roster__item[data-status="speaking"] {
+  border-color: var(--accent);
+  background: var(--ink-800);
+}
+
+.roster__item[data-status="speaking"] .roster__lamp {
+  background: var(--accent);
+  animation: pulse 1s var(--ease-out) infinite;
+}
+
+.roster__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-right: var(--space-md);
+}
+
+.roster__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border-radius: 50%;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.roster__ident {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+
+.roster__name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.roster__host-tag {
+  padding: 0 5px;
+  border: 1px solid rgba(231, 178, 74, 0.35);
+  border-radius: var(--radius-pill);
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.roster__title {
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.roster__status-text {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.roster__item[data-status="speaking"] .roster__status-text {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.roster__focus {
+  padding-left: 10px;
+  border-left: 2px solid var(--line);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+/* ------------------------------------------------------------ 现场 Transcript */
+
+.transcript {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.transcript .empty {
+  flex: 1;
+}
+
+.transcript__viewport {
+  flex: 1;
+  min-height: 0;
+}
+
+.transcript__list {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-xs) var(--space-lg) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.utterance {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius);
+}
+
+.utterance__rail {
+  width: 3px;
+  flex: none;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.utterance__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.utterance__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.utterance__name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.utterance__title {
+  font-size: 11px;
+}
+
+.utterance__intent {
+  padding: 1px 6px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+}
+
+.utterance__time {
+  margin-left: auto;
+  font-size: 10px;
+}
+
+.utterance__content {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+.transcript__jump {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-lg);
+  transform: translateX(-50%);
+  padding: 6px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--ink-700);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+/* ------------------------------------------------------------ 共识与分歧 */
+
+.board {
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-xs) var(--space-lg) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.board__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.board__group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.board__group-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.board__group--consensus .board__group-title {
+  color: var(--consensus);
+}
+
+.board__group--divergence .board__group-title {
+  color: var(--divergence);
+}
+
+.board__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.insight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--line-soft);
+  border-left-width: 2px;
+  border-radius: var(--radius);
+  background: var(--ink-850);
+}
+
+.insight[data-tone="consensus"] {
+  border-left-color: var(--consensus);
+}
+
+.insight[data-tone="divergence"] {
+  border-left-color: var(--divergence);
+}
+
+.insight__statement {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-strong);
+}
+
+.insight__tension {
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.insight__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.insight__supporters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.supporter {
+  padding: 1px 7px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.board__empty {
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+/* ------------------------------------------------------------ 主持人总结 */
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+  border: 1px solid rgba(231, 178, 74, 0.22);
+  border-radius: var(--radius);
+  background: linear-gradient(160deg, rgba(231, 178, 74, 0.07), transparent 70%);
+}
+
+.summary--pending {
+  border-color: var(--line-soft);
+  background: var(--ink-850);
+}
+
+.summary__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.summary__text {
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--text-strong);
+}
+
+.summary__pending-text {
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ------------------------------------------------------------ 响应式分配 */
+
+/* 超宽屏：三栏并列 */
+@media (min-width: 1400px) {
+  .studio__body {
+    grid-template-columns: 300px minmax(0, 1fr) 360px;
+  }
+}
+
+/* 常规桌面：嘉宾席收成横向胶片条，现场与结论并列 */
+@media (min-width: 1024px) and (max-width: 1399px) {
+  .studio__body {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .studio__region--roster {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .studio__region--stage {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .studio__region--board {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .studio__region--roster .roster {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .studio__region--roster .roster__list {
+    flex-direction: row;
+    padding-bottom: var(--space-sm);
+  }
+
+  .studio__region--roster .roster__item {
+    width: 240px;
+    flex: 0 0 auto;
+    max-height: 168px;
+    overflow: hidden;
+  }
+}
+
+/* 窄屏：单栏 + 区域切换，每个区域仍然独占剩余高度并独立滚动 */
+@media (max-width: 1023px) {
+  .studio__head {
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .studio__topic {
+    font-size: 17px;
+  }
+
+  .studio__tabs {
+    display: flex;
+    gap: var(--space-xs);
+    padding: 0 var(--space-lg) var(--space-md);
+  }
+
+  .studio__body {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0 var(--space-lg) var(--space-lg);
+  }
+
+  .studio__body[data-tab="roster"] .studio__region--stage,
+  .studio__body[data-tab="roster"] .studio__region--board,
+  .studio__body[data-tab="stage"] .studio__region--roster,
+  .studio__body[data-tab="stage"] .studio__region--board,
+  .studio__body[data-tab="board"] .studio__region--roster,
+  .studio__body[data-tab="board"] .studio__region--stage {
+    display: none;
+  }
+
+  .studio__summary {
+    max-height: 50%;
+  }
+}

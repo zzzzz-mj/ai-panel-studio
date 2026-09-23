@@ -1,0 +1,469 @@
+/* 基础层：重置、排版、共享原语（按钮 / 输入 / 徽标 / 滚动容器）。 */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+/*
+ * 关键布局约束：整页不滚动。
+ * 每个区域在自己的容器里独立滚动，因此 body 直接锁死溢出，
+ * 由 .app 用 flex 把剩余高度交给页面，再由页面分给各个滚动区。
+ */
+body {
+  margin: 0;
+  overflow: hidden;
+  background: var(--ink-900);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 极淡的舞台顶光，避免大面积纯色显得扁平；固定定位，不参与滚动 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1100px 480px at 50% -12%, rgba(231, 178, 74, 0.07), transparent 70%),
+    radial-gradient(900px 400px at 8% 0%, rgba(95, 179, 201, 0.05), transparent 70%);
+  z-index: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-strong);
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ------------------------------------------------------------ 应用骨架 */
+
+.app {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.app__main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ------------------------------------------------------------ 排版原语 */
+
+.serif {
+  font-family: var(--font-serif);
+  letter-spacing: 0.01em;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.faint {
+  color: var(--text-faint);
+}
+
+/* ------------------------------------------------------------ 滚动容器 */
+
+.scroll-y {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.scroll-x {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.scroll-y::-webkit-scrollbar,
+.scroll-x::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scroll-y::-webkit-scrollbar-thumb,
+.scroll-x::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  background-clip: content-box;
+  border: 2px solid transparent;
+  border-radius: var(--radius-pill);
+}
+
+.scroll-y::-webkit-scrollbar-track,
+.scroll-x::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ------------------------------------------------------------ 按钮 */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-height: 36px;
+  padding: 0 var(--space-lg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--ink-800);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--ink-700);
+  border-color: var(--line-strong);
+  color: var(--text-strong);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #1a1405;
+  font-weight: 600;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--gold-bright);
+  border-color: var(--gold-bright);
+  color: #1a1405;
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-muted);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: var(--ink-800);
+  color: var(--text-strong);
+}
+
+.btn--danger {
+  color: var(--divergence);
+  border-color: rgba(217, 115, 122, 0.35);
+  background: transparent;
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: rgba(217, 115, 122, 0.1);
+  border-color: var(--divergence);
+  color: var(--divergence);
+}
+
+.btn--sm {
+  min-height: 28px;
+  padding: 0 var(--space-md);
+  font-size: 12px;
+}
+
+/* ------------------------------------------------------------ 表单 */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.field__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.field__hint {
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: 10px var(--space-md);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--ink-950);
+  color: var(--text-strong);
+  font: inherit;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--text-faint);
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--gold-deep);
+}
+
+.textarea {
+  resize: none;
+  line-height: 1.6;
+}
+
+/* ------------------------------------------------------------ 徽标 / 指示 */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--ink-800);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.badge--live {
+  border-color: rgba(217, 97, 74, 0.4);
+  background: var(--air-wash);
+  color: #f0a08f;
+}
+
+.badge--ready {
+  border-color: rgba(231, 178, 74, 0.35);
+  background: var(--gold-wash);
+  color: var(--gold-bright);
+}
+
+.badge--ended {
+  color: var(--text-faint);
+}
+
+.badge--paused {
+  border-color: rgba(224, 194, 95, 0.35);
+  color: var(--pending);
+}
+
+.badge--consensus {
+  border-color: rgba(98, 194, 160, 0.35);
+  color: var(--consensus);
+}
+
+.badge--divergence {
+  border-color: rgba(217, 115, 122, 0.35);
+  color: var(--divergence);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+/* ON AIR 呼吸灯：信息性动效，reduced-motion 下保留但去掉缩放 */
+.on-air {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px 3px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--air-wash);
+  border: 1px solid rgba(217, 97, 74, 0.35);
+  color: #f0a08f;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.on-air__lamp {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--air);
+  animation: pulse 1.8s var(--ease-out) infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.82);
+  }
+}
+
+/* 连接状态指示 */
+.conn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.conn[data-state="open"] {
+  color: var(--consensus);
+}
+
+.conn[data-state="closed"] {
+  color: var(--divergence);
+}
+
+/* ------------------------------------------------------------ 分区标题 */
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: 0 var(--space-lg) var(--space-md);
+}
+
+.section-head__title {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+/* ------------------------------------------------------------ 面板容器 */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, var(--ink-850), var(--ink-900));
+}
+
+/* ------------------------------------------------------------ 入场动画（fail-open） */
+
+/* 初始隐藏态只对已确认 JS 可用的会话生效；脚本失败时内容依然可见。 */
+.has-js .on-enter {
+  animation: enter-lift var(--dur-slow) var(--ease-out-expo) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+@keyframes enter-lift {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.has-js .on-fade {
+  animation: enter-fade var(--dur-base) var(--ease-out) both;
+}
+
+@keyframes enter-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 新发言入场：从下方轻微上浮，只动 transform / opacity */
+.has-js .utterance--fresh {
+  animation: enter-lift var(--dur-base) var(--ease-out) both;
+}
+
+/* ------------------------------------------------------------ 降级 */
+
+@media (prefers-reduced-motion: reduce) {
+  .has-js .on-enter,
+  .has-js .on-fade,
+  .has-js .utterance--fresh {
+    animation: enter-fade var(--dur-fast) linear both;
+  }
+
+  .on-air__lamp {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
