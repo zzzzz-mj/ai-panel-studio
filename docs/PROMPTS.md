@@ -7,14 +7,16 @@
 
 | # | 阶段范式 | 目标 | 主要产出 |
 | --- | --- | --- | --- |
-| P1 | **SDD**（规格驱动） | 数据建模与 API 契约生成 | `docs/PRD.md`、`docs/ER.md`、`docs/API.md` |
-| P2 | **SDD → DDD** | 领域模型与数据层落地 | `domain/types.ts`、`schema.sql`、`repo.ts`、`seed.ts` |
-| P3 | **DDD** | 设计上下文与前端组件拆解 | `.uicraft.md`、组件清单 |
-| P4 | **TDD** | 核心逻辑的测试用例与业务实现 | `plan.test.ts`、`json.test.ts` → `plan.ts`、`json.ts` |
-| P5 | **E2E** | 系统级端到端测试与质量闭环 | `tests/e2e/api.test.ts` |
-| P6 | Prompt 工程（跨阶段） | 硬约束与输出容错 | `llm/`（types / prompts / json / mock / openai） |
-| P7 | 交付 | 文档、提交历史与工作流复盘 | `README.md`、`docs/`、分层提交 |
+| P1 | **【SDD 阶段】** | 数据建模与 API 契约生成 | `docs/PRD.md`、`docs/ER.md`、`docs/API.md` |
+| P2 | **【SDD 阶段】** | 契约落到数据层：领域模型与表结构 | `domain/types.ts`、`schema.sql`、`repo.ts`、`seed.ts` |
+| P3 | **【DDD 阶段】** | 设计上下文与前端组件拆解 | `.uicraft.md`、`tokens.css`、组件清单 |
+| P4 | **【DDD 阶段】** | 前端组件与页面生成 | `HomePage` / `SetupPage` / `StudioPage` + 展示组件 |
+| P5 | **【TDD 阶段】** | 核心逻辑的测试用例编写与业务实现 | `plan.test.ts`、`json.test.ts` → `plan.ts`、`json.ts` |
+| P6 | **【E2E 阶段】** | 系统级端到端测试与质量闭环 | `tests/e2e/api.test.ts` |
+| P7 | Prompt 工程（跨阶段） | 硬约束与输出容错 | `llm/`（types / prompts / json / mock / openai） |
+| P8 | 交付 | 文档、提交历史与工作流复盘 | `README.md`、`docs/`、分层提交 |
 
+> **四个必含阶段的索引**：【SDD 阶段】= P1 + P2；【DDD 阶段】= P3 + P4；【TDD 阶段】= P5；【E2E 阶段】= P6。
 > 使用的工具链：Claude Code（Vibe Coding 主体）+ DeepSeek V4 Pro（作为接入讨论引擎的真实模型）。
 
 ---
@@ -56,7 +58,7 @@
 
 ---
 
-## P2 · [SDD → DDD 阶段] 领域模型与数据层落地
+## P2 · [SDD 阶段] 契约落到数据层：领域模型与表结构
 
 ````text
 现在按 docs/API.md 实现后端数据层，只做这一层。
@@ -127,7 +129,51 @@ Design Principles（4-5 条可检查的设计原则）。
 
 ---
 
-## P4 · [TDD 阶段] 核心逻辑的测试用例编写与业务实现
+## P4 · [DDD 阶段] 前端组件与页面生成
+
+````text
+设计方向和组件清单我已确认，现在按 .uicraft.md 和组件清单落地页面代码。只动 web/，不要碰 server/。
+
+一、路由与骨架
+不引入 react-router，自己写一个 useHashRoute（#/ 首页、#/setup/:id 发起页、#/studio/:id 演播厅）。
+状态管理只用 useState / useReducer，不要引入 redux / zustand —— 三页应用不值得。
+先在 web/src/api/types.ts 里把 docs/API.md 的资源形状原样抄成前端类型，再写 client.ts 包一层 fetch。
+
+二、三个页面
+1. 首页 HomePage：进行中 + 历史讨论列表（卡片显示议题、状态、配色预览、发言/共识/分歧计数，
+   每 5 秒轮询刷新），发起入口，以及预置议题库侧栏（点一条直接把议题与背景带进发起页）。
+2. 发起页 SetupPage：填议题（2–200 字）+ 背景 + 专家人数（2–6）→ 创建草稿 → 生成阵容 →
+   以卡片列出主持人 + N 位专家（姓名 / 职业 / Title / 立场 / 简介 / 身份色）→
+   支持逐位微调姓名、Title、立场、身份色 → 确认后锁定，锁定后前端必须拦住再次编辑（后端会返 409）。
+3. 演播厅 StudioPage：三栏 —— 左「嘉宾席」状态小窗（待机 / 准备发言 / 整理思路 / 发言中 +
+   对外可见的关注点摘要），中「现场 Transcript」，右「实时共识与分歧」+ 主持人总结。
+
+三、实时流
+自己写 useDiscussionStream（原生 EventSource，不引第三方库）：
+先收 snapshot 建立全量状态，再按 seq 增量处理 transcript.append / panelist.status /
+insight.upsert / discussion.status / summary.final；浏览器重连会自动带 Last-Event-ID，
+前端必须按 id 幂等 upsert + 按 seq 排序，保证重连既不重复也不丢帧。
+
+四、硬性约束（这几条不接受妥协）
+1. 整页不滚动。每个区域在自己的容器里独立滚动：超宽屏三栏并列、常规桌面收成两栏、
+   窄屏单栏 + Tab 切换区域；无论哪个断点，滚动边界只能是它自己那个容器。
+2. 颜色只能来自服务端分配的 palette，通过 props 传进组件，组件一律不许自己造色 ——
+   transcript 的发言色块、嘉宾席的状态灯、共识/分歧标签三处必须复用同一个 hex。颜色即身份。
+3. 主持人总结按自然语言段落渲染；页面上任何位置都不允许出现 JSON 原文与 ``` 围栏。
+   transcript 里也不允许渲染「举手 / 抢答」这类内部调度事件 —— 它们只影响发言顺序，不上页面。
+4. 无障碍与降级：prefers-reduced-motion 时关掉入场动画，入场动画 fail-open（不得阻塞内容渲染），
+   可点击元素用 button + aria-label，语义化标签。
+5. 窄屏下的区域切换用 Tab，但切换不能重置各区域自己的滚动位置。
+
+先给我完整组件树 + 每个组件的 props 接口，我确认后再逐个实现。
+````
+
+**说明**：DDD 阶段的难点不在「把页面画出来」，而在让**契约、设计令牌、实时流**三件事同时约束住组件接口。所以这一段把「颜色只能从 props 传进来」和「只消费 `web/src/api/types.ts` 的契约类型」写成了硬约束 —— 前者保证同一位嘉宾在三处显示同一个颜色，后者保证服务端改字段时前端在编译期就报错，而不是等联调才发现。
+另外明确写了「不引路由库与状态库」：一旦允许 AI 自由选型，它会为一个三页应用引入整套方案，交付时的风险远大于收益。实际产出中也确实出现过一个坑 —— 组件一开始各自 `import` 配色表，`StudioPage` 里的嘉宾色和 `InsightBoard` 里的对不上，正是靠「组件不许造色」这条约束才收敛掉的。
+
+---
+
+## P5 · [TDD 阶段] 核心逻辑的测试用例编写与业务实现
 
 ````text
 进入核心逻辑。这部分不允许先写实现 —— 先写测试，我确认测试用例合理之后再写实现。
@@ -157,7 +203,7 @@ Design Principles（4-5 条可检查的设计原则）。
 
 ---
 
-## P5 · [E2E 阶段] 系统级端到端测试与质量闭环
+## P6 · [E2E 阶段] 系统级端到端测试与质量闭环
 
 ````text
 现在写系统级端到端测试：server/tests/e2e/api.test.ts。完全走 HTTP，用 supertest 打真实 Express
@@ -194,7 +240,7 @@ Design Principles（4-5 条可检查的设计原则）。
 
 ---
 
-## P6 · [跨阶段 · Prompt 工程] 硬约束与输出容错
+## P7 · [跨阶段 · Prompt 工程] 硬约束与输出容错
 
 ````text
 现在做 LLM 接入层：server/src/llm/。这一层的目标不是「把 prompt 写漂亮」，而是
@@ -230,7 +276,7 @@ Design Principles（4-5 条可检查的设计原则）。
 
 ---
 
-## P7 · [交付阶段] 文档、提交历史与工作流复盘
+## P8 · [交付阶段] 文档、提交历史与工作流复盘
 
 ````text
 收尾，三件事：
