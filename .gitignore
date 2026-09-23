@@ -7,6 +7,9 @@ dist/
 build/
 *.tsbuildinfo
 
+# 交付打包产物
+*.zip
+
 # 运行时数据（SQLite 数据库由初始化脚本重建）
 data/
 *.db
