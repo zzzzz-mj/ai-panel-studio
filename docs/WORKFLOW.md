@@ -2,9 +2,13 @@
 
 > Prompt 原文见 [PROMPTS.md](./PROMPTS.md)（P1–P8），下文沿用同一套编号。
 
-## 1. 开发工作流：Claude Code + DeepSeek V4 Pro
+## 1. 开发工作流：TraeCode + DeepSeek V4.1 Flash
 
-工具是 **Claude Code**，接入模型 **DeepSeek V4 Pro**。项目没有「一句话生成」，而是拆成八次可验收的对话，每次只让 AI 交付**一层**，验收通过才进下一层。
+工具是 **TraeCode**（TRAE 的 AI 原生 IDE），接入模型 **DeepSeek V4.1 Flash**。
+
+> 题面以「Claude Code + DeepSeek V4 Pro」举例，本项目的实际工具链是 TraeCode + DeepSeek V4.1 Flash —— 两者同属「AI 原生 IDE / Coding Agent + 大模型」这一形态，下文的分层交付流程与三个典型问题均出自真实开发过程。
+
+项目没有「一句话生成」，而是拆成八次可验收的对话，每次只让 AI 交付**一层**，验收通过才进下一层。
 
 **先定契约，再写代码。** 第一步（P1，SDD）只要文档，并明确写了「不要生成代码」—— 一旦让模型同时输出文档和实现，它就会用实现细节去迁就文档，契约里该有的边界反而被跳过。产出的 `PRD` / `ER` / `API` 成了后续所有对话的验收基准：写数据层、引擎层、前端时不必复述产品，只说「按 `docs/API.md` 实现」。
 

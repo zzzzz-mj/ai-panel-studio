@@ -17,7 +17,8 @@
 | P8 | 交付 | 文档、提交历史与工作流复盘 | `README.md`、`docs/`、分层提交 |
 
 > **四个必含阶段的索引**：【SDD 阶段】= P1 + P2；【DDD 阶段】= P3 + P4；【TDD 阶段】= P5；【E2E 阶段】= P6。
-> 使用的工具链：Claude Code（Vibe Coding 主体）+ DeepSeek V4 Pro（作为接入讨论引擎的真实模型）。
+> 使用的工具链：**TraeCode**（TRAE 的 AI 原生 IDE，Vibe Coding 主体）+ **DeepSeek V4.1 Flash**（同时作为接入讨论引擎的真实模型）。
+> 题面示例为「Claude Code + DeepSeek V4 Pro」，实际开发使用的是上述工具链，两者同属「AI 原生 IDE + 大模型」形态。
 
 ---
 
@@ -301,3 +302,5 @@ insight.upsert / discussion.status / summary.final；浏览器重连会自动带
 **说明**：把「说明要写真实发生的事，包括 AI 一开始做错的地方」写进 Prompt，是因为复盘文档最容易退化成自我表扬。
 实际的失败清单（无标点截断的边界算错、内存库没有 seed、句数断言没排除总结、共识池条件不满足、状态校验漏了 `ready` 态）比任何成功案例都更能说明「工程化 AI 开发」到底在防什么。
 要求提交历史体现分层，则是把「工程化拆解」这个考核点落成一个可被客观检查的痕迹。
+
+> 工具链说明：上面第 3 点沿用了题面的表述（Claude Code + DeepSeek V4 Pro），**实际开发使用的是 TraeCode + DeepSeek V4.1 Flash**，详见 [WORKFLOW.md](./WORKFLOW.md) 第 1 节。
